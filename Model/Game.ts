@@ -1,17 +1,23 @@
+import { Player } from "./Player";
+import { Deck } from "./Deck";
+
 export interface Game {
     // Each game has a
     // number of players
     size: number;
+
     //number of decks
     decksRequired: number;
 
+    // the current deck used if any
+    deck? : Deck;
     // Each game needs to
     // Deal to all players at first
-    dealAll();
+    dealAll(players: number[], hands: object);
+
     // deal individual players
-    dealPlayer();
-    nextPlayer();
-    acceptPlayer(): boolean;
-    discardPlayer();
+    dealPlayer(Player: Player, Deck: number[][]);
+
+    clearAll();
 
 }

@@ -2,7 +2,7 @@
  * The Deck class representing a Deck
  * 4x13 Matrix
 */
-class Deck {
+export class Deck {
     // Properties:
 
     // Decks count

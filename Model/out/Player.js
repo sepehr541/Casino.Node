@@ -6,19 +6,30 @@ class Player {
         this.name = name;
         this.chipsCount = 0;
         this.playerID = Math.random() * 10;
-        this.tableID = 0;
+        this.tableID = null;
     }
     // join table
-    joinTable(tableID) {
-        if (tableID) {
-            this.leaveTable(tableID);
+    joinTable(table) {
+        if (table) {
+            this.leaveTable(table);
         }
-        this.tableID = tableID;
+        this.tableID = table;
     }
     // leave table
     leaveTable(tableID) {
         // let table know your leaving
-        this.tableID = 0;
+        this.tableID = null;
+        tableID.discardPlayer(this.playerID);
+    }
+    betChips() {
+    }
+    /**
+     * getter for playerID
+     *
+     * @returns {number}
+     */
+    getPlayerID() {
+        return this.playerID;
     }
 }
 exports.Player = Player;

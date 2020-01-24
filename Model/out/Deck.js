@@ -1,3 +1,5 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 /**
  * The Deck class representing a Deck
  * 4x13 Matrix
@@ -56,5 +58,6 @@ class Deck {
         });
     }
 }
+exports.Deck = Deck;
 ;
 //# sourceMappingURL=Deck.js.map

@@ -12,7 +12,7 @@ export class Player {
 
     // current table id
     tableID: Table;
-    
+
     // functions:
     constructor(name){
         this.name = name;
@@ -33,11 +33,19 @@ export class Player {
     leaveTable(tableID){
         // let table know your leaving
         this.tableID = null;
-        tableID.discardPlayer(this);
+        tableID.discardPlayer(this.playerID);
     }
 
     betChips(){
 
     }
-    
+
+    /**
+     * getter for playerID
+     * 
+     * @returns {number}
+     */
+    getPlayerID(): number {
+        return this.playerID;
+    }    
 }

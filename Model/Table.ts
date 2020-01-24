@@ -1,5 +1,4 @@
 import {Game} from "./Game";
-import {Player} from "./Player";
 export class Table {
     // properties:
     // max number of players
@@ -8,24 +7,37 @@ export class Table {
     gameOfTable: Game;
 
     // Players
-    players : Player[];
+    players : number[];
+
+    // index of curr player for turn tracking
+    currPlayer: number;
+
+    // hands corresponding to each player
+    playersHands: object;
+
+    //bets
+    bets: object;
 
     // functions:
-    constructor(size, type){
+    constructor(size, type: Game){
         this.size = size;
         this.gameOfTable = type;
+        this.playersHands = {};
+        this.bets = {};
     }
 
     dealAll(){
-
+        this.gameOfTable.dealAll(this.players, this.playersHands);
     }
 
     dealPlayer(){}
 
-    nextPlayer(){}
+    acceptPlayer(): boolean{
+        return false;
+    }
 
-    discardPlayer(){
-
+    discardPlayer(): boolean{
+        return false
     }
 
 
