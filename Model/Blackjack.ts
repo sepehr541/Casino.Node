@@ -10,19 +10,36 @@ export class Blackjack implements Game {
     deck: Deck;
 
     // functions:
+
+    /**
+     * Blackjack
+     */
     constructor(){
         this.size = 7;
         this.decksRequired = 6;
         this.deck = new Deck(6);
     }
 
-    dealAll(players: number[], hands: object,) {
+
+    /**
+     * Deals players Two cards 
+     * Must be called at the beginning of each round
+     * 
+     * @param players 
+     * @param hands 
+     */
+    dealAll(players: Player[], hands: object,) {
         if (players.length !== 0){
-            for (let player of players){
-                hands[player] = this.deck.getCard();
-            }
+            //TODO
+            // for (let player of players){
+            //     hands[player.getPlayerID()] = this.deck.getCard();
+            // }
         }
     }
+
+    /**
+     * 
+     */
     dealPlayer(Player: any) {
         throw new Error("Method not implemented.");
     }

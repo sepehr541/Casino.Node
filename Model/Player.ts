@@ -1,4 +1,7 @@
-import {Table} from "./Table";
+import { Table } from "./Table";
+import { IdGenerator } from "./IdGenerator";
+import "./CustomErrors";
+import { InsufficentChipsError } from "./CustomErrors";
 export class Player {
     // Properties:
     // playerID
@@ -8,36 +11,55 @@ export class Player {
     name: string;
 
     // chips
-    chipsCount : number;
+    chipsCount: number;
 
     // current table id
     tableID: Table;
 
     // functions:
-    constructor(name){
+    constructor(name) {
         this.name = name;
         this.chipsCount = 0;
-        this.playerID = Math.random() * 10;
+        this.playerID = IdGenerator.generateID();
         this.tableID = null;
     }
 
     // join table
-    joinTable(table){
-        if (table){
-            this.leaveTable(table);
+    joinTable(table) {
+        if (this.tableID !== null) {
+            this.leaveTable();
         }
         this.tableID = table;
+        table.acceptPlayer(this);
     }
 
     // leave table
-    leaveTable(tableID){
+    leaveTable() {
         // let table know your leaving
+        this.tableID.discardPlayer(this);
         this.tableID = null;
-        tableID.discardPlayer(this.playerID);
     }
 
-    betChips(){
+    /**
+     * Player bets at the table
+     * @param amount amount of bet
+     */
+    betChips(amount: number) {
+        //Throw error if amount is bigger than chips in account
+        if (this.chipsCount < amount) {
+            throw new InsufficentChipsError("Not enough chips");
+        }
 
+        // Catch errors thrown by the table
+        try {
+            if (this.tableID.placeBet(amount, this)) {
+                this.chipsCount -= amount;
+            }
+        } 
+        // TODO add more specific errors
+        catch (error) {
+            console.log("Bet could not be placed at this time");
+        }
     }
 
     /**
@@ -47,5 +69,5 @@ export class Player {
      */
     getPlayerID(): number {
         return this.playerID;
-    }    
+    }
 }

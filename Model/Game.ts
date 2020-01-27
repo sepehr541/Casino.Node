@@ -13,7 +13,7 @@ export interface Game {
     deck? : Deck;
     // Each game needs to
     // Deal to all players at first
-    dealAll(players: number[], hands: object);
+    dealAll(players: Player[], hands: object);
 
     // deal individual players
     dealPlayer(Player: Player, Deck: number[][]);

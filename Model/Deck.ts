@@ -49,9 +49,9 @@ export class Deck {
     /**
      * deals a card from the deck
      * 
-     * @returns {void}
+     * @returns {string}
      */
-    getCard(): number[] {
+    getCard(): string {
         //gen a rand num in range of [0, 3] choosing suit
         let randSuit: number = Math.floor(Math.random() * 4);
 
@@ -62,7 +62,7 @@ export class Deck {
         if ((this.cards[randSuit])[randCard] < this.decksCount){
             (this.cards[randSuit])[randCard] = (this.cards[randSuit])[randCard] + 1;
             this.deltCardsCount++;
-            return [randSuit, randCard];
+            return [randSuit, randCard].join("");
         } else { // if all is delt, try another card;
             return this.getCard();
         }
