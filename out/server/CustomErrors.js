@@ -28,4 +28,25 @@ class TableBetsClosedError extends Error {
     }
 }
 exports.TableBetsClosedError = TableBetsClosedError;
+class WrongTurnBettingError extends Error {
+    constructor(message) {
+        super(message);
+        this.name = "WrongTurnBettingError";
+    }
+}
+exports.WrongTurnBettingError = WrongTurnBettingError;
+class NotAtTable extends Error {
+    constructor(message) {
+        super(message);
+        this.name = "NotAtTable";
+    }
+}
+exports.NotAtTable = NotAtTable;
+class EmptyTable extends Error {
+    constructor(message) {
+        super(message);
+        this.name = "EmptyTable";
+    }
+}
+exports.EmptyTable = EmptyTable;
 //# sourceMappingURL=CustomErrors.js.map

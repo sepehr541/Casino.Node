@@ -14,8 +14,6 @@ export class Deck {
     // deltCardCount
     deltCardsCount: number;
 
-
-
     // Functions:
 
     /**
@@ -77,6 +75,4 @@ export class Deck {
             suit.fill(0);
         })
     }
-
-
 };

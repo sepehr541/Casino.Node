@@ -26,3 +26,26 @@ export class TableBetsClosedError extends Error{
         this.name = "TableBetsClosedError";
     }
 }
+
+
+export class WrongTurnBettingError extends Error{
+    constructor(message){
+        super(message);
+        this.name = "WrongTurnBettingError";
+    }
+}
+
+export class NotAtTable extends Error {
+    constructor(message){
+        super(message);
+        this.name = "NotAtTable";
+    }
+}
+
+
+export class EmptyTable extends Error {
+    constructor(message){
+        super(message);
+        this.name = "EmptyTable";
+    }
+}

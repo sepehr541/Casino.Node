@@ -10,11 +10,13 @@ class Player {
         this.chipsCount = 0;
         this.playerID = IdGenerator_1.IdGenerator.generateID();
         this.tableID = null;
+        this.seat = -1;
     }
     // join table
     joinTable(table) {
         if (this.tableID !== null) {
             this.leaveTable();
+            this.seat = -1;
         }
         this.tableID = table;
         table.acceptPlayer(this);
@@ -36,22 +38,36 @@ class Player {
         }
         // Catch errors thrown by the table
         try {
-            if (this.tableID.placeBet(amount, this)) {
-                this.chipsCount -= amount;
-            }
+            this.tableID.placeBet(amount, this);
+            this.chipsCount -= amount;
         }
         // TODO add more specific errors
         catch (error) {
-            console.log("Bet could not be placed at this time");
+            console.log(error);
         }
     }
     /**
      * getter for playerID
      *
-     * @returns {number}
+     * @returns {string}
      */
     getPlayerID() {
-        return this.playerID;
+        return this.playerID.toString();
+    }
+    /**
+     * setter for seat
+     * @param seatIndex seat index at the table
+     */
+    setSeat(seatIndex) {
+        this.seat = seatIndex;
+    }
+    /**
+     * getter for seat
+     *
+     * @returns {number}
+     */
+    getSeat() {
+        return this.seat;
     }
 }
 exports.Player = Player;
