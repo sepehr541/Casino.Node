@@ -4,7 +4,8 @@
   "description": "Online Casino made with React and Node",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node ./bin/www"
   },
   "repository": {
     "type": "git",
@@ -18,7 +19,15 @@
   "homepage": "https://github.com/sepehr541/Casino.Node#readme",
   "dependencies": {
     "@types/jasmine": "^3.5.1",
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "http": "0.0.1-security",
+    "morgan": "^1.10.0",
+    "socket.io": "^2.3.0",
+    "winston": "^3.2.1",
+    "cookie-parser": "~1.4.4",
+    "debug": "~2.6.9",
+    "http-errors": "~1.6.3",
+    "jade": "~1.11.0"
   },
   "devDependencies": {
     "@types/jasmine": "^3.5.1",

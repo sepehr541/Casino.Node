@@ -1,10 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 require("jasmine");
-const Table_1 = require("../server/Table");
-const Player_1 = require("../server/Player");
-const Blackjack_1 = require("../server/Blackjack");
-const CustomErrors_1 = require("../server/CustomErrors");
+const Table_1 = require("../game/Table");
+const Player_1 = require("../game/Player");
+const Blackjack_1 = require("../game/Blackjack");
+const CustomErrors_1 = require("../game/CustomErrors");
 /**
  * IF PRINTING A PLAYER OR TABLE, Remember that it would be CIRCULAR
  * Table and player have a bidirectional relationship

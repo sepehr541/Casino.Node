@@ -1,8 +1,8 @@
 import "jasmine";
-import {Table} from "../server/Table";
-import {Player} from "../server/Player";
-import {Blackjack} from "../server/Blackjack";
-import { InsufficentChipsError } from "../server/CustomErrors";
+import {Table} from "../game/Table";
+import {Player} from "../game/Player";
+import {Blackjack} from "../game/Blackjack";
+import { InsufficentChipsError } from "../game/CustomErrors";
 /**
  * IF PRINTING A PLAYER OR TABLE, Remember that it would be CIRCULAR
  * Table and player have a bidirectional relationship
