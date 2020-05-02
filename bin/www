@@ -7,12 +7,15 @@
 var app = require('../app');
 var debug = require('debug')('casino.server:server');
 var http = require('http');
+var init = require('../game/init');
+
+
 
 /**
  * Get port from environment and store in Express.
  */
 
-var port = normalizePort(process.env.PORT || '3000');
+var port = normalizePort(process.env.PORT || '9000');
 app.set('port', port);
 
 /**
@@ -26,8 +29,69 @@ var server = http.createServer(app);
  */
 
 server.listen(port);
+
 server.on('error', onError);
 server.on('listening', onListening);
+
+/**
+ * Setup socket.io 
+ */
+
+var io = require('socket.io')(server);
+var { tables, privates } = init(io);
+var { findEmptyTable } = require('../game/Manager.js');
+var Player = require('../game/Player')
+
+// io.on('connection', (socket) => {
+//   console.log('Connected to root (/)');
+// });
+
+// io.set('origins', '*:*');
+
+/**
+ * Public Tables
+ */
+const tablesSocket = io.of('/tables');
+
+tablesSocket.on('connection', (socket) => {
+  console.log('Connected to namespace for tables');
+  socket.emit('connected');
+  socket.on('connected', (msg)=>{
+    console.log(msg);
+  })
+
+  socket.on('JOIN_PUBLIC', (name) => {
+    console.log(name + ' sent request');
+    console.log('Looking for a table available');
+    // find if a table is empty
+    var table = findEmptyTable(tables);
+
+    // if no empty table let client know
+    if (table === null) {
+      socket.emit('noTable');
+    }
+    // if empty table found, join table's room
+    else {
+      socket.join(`table${table.getTableId()}`, () => {
+        let player = new Player(name);
+        console.log(`Successfully joined table ${table.getTableId()}`);
+        player.joinTable(table);
+        console.log( table.getStatus());
+        socket.emit('init', table.getStatus());
+      })
+    }
+  })
+
+})
+
+/**
+ * Private Tables
+ */
+const privateTables = io.of('/tables/private');
+
+privateTables.on('connection', (socket) => {
+
+})
 
 /**
  * Normalize a port into a number, string, or false.
