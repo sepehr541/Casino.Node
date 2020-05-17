@@ -38,6 +38,9 @@ class Deck {
      * @returns {string}
      */
     getCard() {
+        if (this.deltCardsCount == 52) {
+            this.shuffle();
+        }
         //gen a rand num in range of [0, 3] choosing suit
         let randSuit = Math.floor(Math.random() * 4);
 

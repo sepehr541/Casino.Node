@@ -12,8 +12,8 @@ class Player {
     constructor(name) {
         this.name = name;
         this.chipsCount = 500;
-        this.playerID = IdGenerator.generateID();
-        this.tableID = null;
+        this.playerId = IdGenerator.generateID();
+        this.tableId = null;
         this.seat = -1;
     }
 
@@ -23,19 +23,19 @@ class Player {
      * 
      */
     joinTable(table) {
-        if (this.tableID !== null) {
+        if (this.tableId !== null) {
             this.leaveTable();
             this.seat = -1;
         }
-        this.tableID = table;
+        this.tableId = table;
         table.acceptPlayer(this);
     }
 
     // leave table
     leaveTable() {
         // let table know your leaving
-        this.tableID.discardPlayer(this);
-        this.tableID = null;
+        this.tableId.discardPlayer(this);
+        this.tableId = null;
     }
 
     /**
@@ -50,7 +50,7 @@ class Player {
 
         // Catch errors thrown by the table
         try {
-            this.tableID.placeBet(amount, this);
+            this.tableId.placeBet(amount, this);
             this.chipsCount -= amount;
         } 
         // TODO add more specific errors
@@ -65,7 +65,7 @@ class Player {
      * @returns {string}
      */
     getPlayerId() {
-        return this.playerID.toString();
+        return this.playerId.toString();
     }
     
     /**
@@ -87,6 +87,15 @@ class Player {
 
     getName() {
         return this.name;
+    }
+
+
+    addChips(amount) {
+        this.chipsCount += amount;
+    }
+
+    getChips() {
+        return this.chipsCount;
     }
 
 }

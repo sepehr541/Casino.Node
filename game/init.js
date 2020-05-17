@@ -1,13 +1,15 @@
 var Table = require('./Table');
 var Blackjack = require('./Blackjack');
 
-const init = (socket) => {
-    let tables = [];
-    let privates = [];
-    tables.push(new Table(new Blackjack(), 1, socket.to(`table${1}`)));
+const init = (io) => {
+    let tables = {};
+    let privates = {};
+    tables['1'] = (new Table(new Blackjack(), '1', io.in(`table${1}`)));
+    idArray = ['1'];
     return {
         tables,
-        privates
+        privates,
+        idArray
     }
 }
 

@@ -9,7 +9,7 @@ class Blackjack{
      * Create a game of BlackJack
      */
     constructor(){
-        this.size = 7;
+        this.size = 5;
         this.decksRequired = 6;
         this.deck = new Deck(6);
     }
@@ -21,25 +21,6 @@ class Blackjack{
         return this.size;
     }
     
-    /**
-     * 
-     * @param {Player[]} players active players of table
-     */
-    start(dealerHand, players, bets, hands) {
-        // initial round of giving cards
-        this.dealAll(dealerHand, players, bets, hands);
-
-        let occupiedSeatIndice = this.isAllNull(players);
-        currentPlayer = occupiedSeatIndice[0];
-        //players act from right to left of table
-        players.forEach(player => {
-            while(currentPlayer = player.getSeat()) {
-                
-            }
-        });
-        // dealer reveals and then acts accordingly
-
-    }
 
     /**
      * Initial dealing of hands
@@ -51,30 +32,22 @@ class Blackjack{
      */
     dealAll(dealerHand, players, bets, hands){
         for(let i = 0; i < 2; i++){
-            for (let pID of bets.keys()){
-                hands.get(pID).push(this.deck.getCard());
+            for (let playerId of bets.keys()){
+                hands.get(playerId).push(this.deck.getCard());
             }
             dealerHand.push(this.deck.getCard());
         }
-
-        // not sure what this part is doing
-
-        let firstPlayer = 0;
-        try{
-            firstPlayer = this.getFirstPlayer(players);
-        }
-        catch(error){
-            return 0;
-        }
-
-        return firstPlayer;
     }
 
     /**
      * Hit a player
      */
-    dealPlayer(playerID, hands) {
-        hands.get(playerID).push(this.deck.getCard());
+    dealPlayer(playerId, hands) {
+        hands.get(playerId).push(this.deck.getCard());
+    }
+
+    dealDealer(dealerHand) {
+        dealerHand.push(this.deck.getCard());
     }
 
 
@@ -91,55 +64,30 @@ class Blackjack{
 
     }
 
-    /**
-     * get first player in turn
-     * @param players 
-     */
-    getFirstPlayer(players){
-        for(let i = 0; i < players.length; i++){
-            if(players[i] !== null){
-                return i;
-            }
-        }
-        throw new EmptyTable("This table is empty");
-    }
 
-
-    /**
-     * get next player according to rules of the game
-     * 
-     * @param {number} currentPlayer
-     * @param {Player[]} players
-     */
-    getNextPlayer(players, currentPlayer){
-        for(let i = (currentPlayer + 1) % players.length; i < players.length; i++){
-            if(players[i] !== null) {
-                return i;
-            }       
-        }
-        return currentPlayer + 1;
-    }
 
     /**
      * Sum the value of a player's hand
      * @param {string[]} hand 
      */
     sumHand(hand) {
+        // initial sum
         let sum = 0;
+        // rank cards saved in this
         let cards = [];
-        let hasAce = false
+
+        // if we have ace or not, as ace can be either 1 or 11
+        let hasAce = false;
+
         hand.forEach(card => {
-            let rank = parseInt(card.substr(1)) + 1;
-            cards.push(rank); //plus one to compensate 0-based indexing
-            if (rank  === 1){
-                hasAce = true;
-            }
+            let rank = parseInt(card.split('-')[1]) + 1;
+            cards.push(rank);
         });
 
         for (let card of cards){
-            if(card === 1 && sum + 11 > 21){ // Ace as 1
+            if(card === 1 && sum + 11 > 21){ // Ace as 0
                 sum++;
-            } else if (card === 1 && sum + 11 <= 21){ // Ace as 1
+            } else if (card === 1 && sum + 11 <= 21){ // Ace as 0
                 sum += 11
             } else if(card >= 10){ // 10 and face cards 
                 if(!hasAce){

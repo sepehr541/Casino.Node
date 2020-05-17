@@ -38,9 +38,7 @@ server.on('listening', onListening);
  */
 
 var io = require('socket.io')(server);
-var { tables, privates } = init(io);
-var { findEmptyTable } = require('../game/Manager.js');
-var Player = require('../game/Player')
+
 
 // io.on('connection', (socket) => {
 //   console.log('Connected to root (/)');
@@ -51,12 +49,15 @@ var Player = require('../game/Player')
 /**
  * Public Tables
  */
-const tablesSocket = io.of('/tables');
+const tablesNSP = io.of('/tables');
+var { tables, privates, idArray } = init(tablesNSP);
+var { findEmptyTable } = require('../game/Manager.js');
+var Player = require('../game/Player');
 
-tablesSocket.on('connection', (socket) => {
-  console.log('Connected to namespace for tables');
+tablesNSP.on('connection', (socket) => {
+  console.log('Connected - backend socket');
   socket.emit('connected');
-  socket.on('connected', (msg)=>{
+  socket.on('connected', (msg) => {
     console.log(msg);
   })
 
@@ -64,24 +65,50 @@ tablesSocket.on('connection', (socket) => {
     console.log(name + ' sent request');
     console.log('Looking for a table available');
     // find if a table is empty
-    var table = findEmptyTable(tables);
+    var table = findEmptyTable(tables, idArray);
 
     // if no empty table let client know
     if (table === null) {
       socket.emit('noTable');
+      console.log('No Table found');
     }
     // if empty table found, join table's room
     else {
       socket.join(`table${table.getTableId()}`, () => {
-        let player = new Player(name);
+        // table makes the new player and adds it to its
+        let playerId = table.handleJoinEvent(name);
         console.log(`Successfully joined table ${table.getTableId()}`);
-        player.joinTable(table);
-        console.log( table.getStatus());
-        socket.emit('init', table.getStatus());
+        // send initial to sender, including playerId
+        socket.emit('init', {
+          ...table.getStatus(),
+          playerId
+        });
+        // send status to the rest
+        table.emitStatus();
+      })
+
+      socket.on('BET', (payload) => {
+        console.log('BET Event received');
+        tables[payload.tableId].handleBetEvent(payload);
+      })
+
+      socket.on('HIT', (payload) => {
+        console.log('HIT Event received');
+        tables[payload.tableId].handleHitEvent(payload);
+      })
+
+      socket.on('STAY', (payload) => {
+        console.log('STAY Event received');
+        tables[payload.tableId].handleStayEvent(payload);
+      })
+
+      socket.on('LEAVE', (payload) => {
+        console.log('LEAVE Event received');
+        socket.leave(`table${payload.tableId}`);
+        tables[payload.tableId].handleLeaveEvent(payload.playerId);
       })
     }
   })
-
 })
 
 /**

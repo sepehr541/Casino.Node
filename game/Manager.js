@@ -5,10 +5,10 @@ const Blackjack = require('./Blackjack');
  * find a table with empty seat
  * @param {Tables[]} tables 
  */
-const findEmptyTable = (tables) => {
-    for (let i = 0; i < tables.length; i++) {
-        if (tables[i].hasSeat()) {
-            return tables[i];
+const findEmptyTable = (tables, idArray) => {
+    for (id of idArray) {
+        if (tables[id].hasSeat()) {
+            return tables[id];
         }
     }
     return null;
@@ -19,7 +19,7 @@ const findEmptyTable = (tables) => {
 
 // make private tables
 const makePrivateTable = (privates, id) =>{
-    privates.push(new Table())
+    privates[id] = (new Table(new Blackjack(), id, null));
 }
 
 // verify wins with db
