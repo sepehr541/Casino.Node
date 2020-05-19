@@ -86,28 +86,29 @@ tablesNSP.on('connection', (socket) => {
         // send status to the rest
         table.emitStatus();
       })
-
-      socket.on('BET', (payload) => {
-        console.log('BET Event received');
-        tables[payload.tableId].handleBetEvent(payload);
-      })
-
-      socket.on('HIT', (payload) => {
-        console.log('HIT Event received');
-        tables[payload.tableId].handleHitEvent(payload);
-      })
-
-      socket.on('STAY', (payload) => {
-        console.log('STAY Event received');
-        tables[payload.tableId].handleStayEvent(payload);
-      })
-
-      socket.on('LEAVE', (payload) => {
-        console.log('LEAVE Event received');
-        socket.leave(`table${payload.tableId}`);
-        tables[payload.tableId].handleLeaveEvent(payload.playerId);
-      })
     }
+  })
+  socket.on('BET', (payload) => {
+    console.log('BET Event received');
+    tables[payload.tableId].handleBetEvent(payload);
+  })
+
+  socket.on('HIT', (payload) => {
+    console.log('HIT Event received');
+    tables[payload.tableId].handleHitEvent(payload);
+  })
+
+  socket.on('STAY', (payload) => {
+    console.log('STAY Event received');
+    tables[payload.tableId].handleStayEvent(payload);
+  })
+
+  socket.on('LEAVE', (payload) => {
+    console.log('LEAVE Event received');
+    socket.leave(`table${payload.tableId}`, ()=>{
+      console.log("Table Left");
+    });
+    tables[payload.tableId].handleLeaveEvent(payload.playerId);
   })
 })
 

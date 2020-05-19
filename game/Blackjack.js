@@ -9,7 +9,7 @@ class Blackjack{
      * Create a game of BlackJack
      */
     constructor(){
-        this.size = 5;
+        this.size = 3;
         this.decksRequired = 6;
         this.deck = new Deck(6);
     }
@@ -21,7 +21,6 @@ class Blackjack{
         return this.size;
     }
     
-
     /**
      * Initial dealing of hands
      * Two cards per player
@@ -59,12 +58,6 @@ class Blackjack{
     skipPlayer(currentPlayer, players) {
         return this.getNextPlayer(players, currentPlayer);
     }
-
-    clearAll(){
-
-    }
-
-
 
     /**
      * Sum the value of a player's hand
