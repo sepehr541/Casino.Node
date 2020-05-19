@@ -46,8 +46,7 @@ class Table {
     // show dealer's hand to player or not
     showDealer;
 
-    // tracking handsSum instead of recalculating
-    handsSum;
+    // idleMap <id: String, roudnsIdle: Integer>
 
     /** 
      * @param {Game} game gameOfTable
@@ -69,7 +68,8 @@ class Table {
         this.isGameRunning = false;
         this.playerCount = 0;
         this.showDealer = false;
-        this.handsSum = {};
+        this.loopRunning = false;
+        this.idleMap = new Map();
     }
 
     /**
@@ -79,7 +79,6 @@ class Table {
     dealAll() {
         // deal all players
         this.gameOfTable.dealAll(this.dealerHand,
-            this.players,
             this.bets,
             this.playersHands);
     }
@@ -122,8 +121,10 @@ class Table {
         this.playersHands.set(player.getPlayerId(), []);
         //player has an initial bet of 0
         this.bets.set(player.getPlayerId().toString(), 0);
+
+        this.idleMap.set(player.getPlayerId(), 0)
         this.playerCount++;
-        if (this.playerCount === 1)
+        if (this.playerCount === 1 && !this.loopRunning)
             this.gameLoop();
     }
 
@@ -137,9 +138,8 @@ class Table {
         // set to null
         this.players[seatIndex] = null;
         // if has bet
-        if (this.actives[seatIndex] !== null) {
-            this.actives[seatIndex] = null;
-        }
+        this.bets.delete(player.getPlayerId());
+
         this.playerCount--;
     }
 
@@ -260,29 +260,44 @@ class Table {
     gamePromise;
     gameInterval;
     resolvePlayerPromise;
+    loopRunning;
 
     async gameLoop() {
-        console.log('Game Loop started');
+        this.loopRunning = true;
+        //console.log('Game Loop started');
         let WAIT_TIME = 10000;
 
         while (this.playerCount > 0) {
-            console.log('Begin round');
+            //console.log('Begin round');
             // open bets
             this.openBets();
             this.emitStatus();
-            await this.timer(WAIT_TIME);
-            if (this.playerCount === 0) {
+            
+            let idlePreventionCounter = 0;
+
+            // waits a minute then breaks out of the game
+            while (this.isBetEmpty() &&  this.playerCount > 0 && idlePreventionCounter < 6) {
+                this.emitStatus();
+                await this.timer(WAIT_TIME);
+                idlePreventionCounter++;
+            };
+
+            if (this.playerCount === 0 || idlePreventionCounter === 6) {
                 break;
             }
-            console.log("Closing bets");
+
+            //console.log("Closing bets");
             this.closeBets();
             this.emitStatus();
+
             if (this.playerCount === 0) {
                 break;
             }
-            console.log("Dealing all");
+            //console.log("Dealing all");
             this.dealAll();
             this.emitStatus();
+
+            this.currentPlayer = 0;
 
             // now wait on each player and their action
             while (this.currentPlayer < this.size && this.playerCount > 0) {
@@ -295,20 +310,20 @@ class Table {
                     // sum the hand
                     let handSum = this.gameOfTable.sumHand(playerHand);
 
-                    console.log(this.players[this.currentPlayer].getName() + " HandSum: " + handSum);
+                    //console.log(this.players[this.currentPlayer].getName() + " HandSum: " + handSum);
 
                     if (handSum === 21) {
-                        console.log('PLAYER HAS BLACKJACK');
+                        //console.log('PLAYER HAS BLACKJACK');
                         this.getNextPlayer();
                         continue;
                     }
 
                     // if no action from player, the timeout will resolve the promise
                     // if there is an action from player, we resolve the promise, clear the timeout
-                    console.log('Waiting on Action');
+                    //console.log('Waiting on Action');
                     let action = await this.actionTimer(WAIT_TIME);
 
-                    console.log("Player Choose to: " + action);
+                   // console.log("Player Choose to: " + action);
 
                     if (this.playerCount === 0 || turn !== this.currentPlayer) {
                         continue;
@@ -326,43 +341,45 @@ class Table {
                 }
                 this.getNextPlayer();
                 this.emitStatus();
+                //console.log(process.memoryUsage());
             }
 
             if (this.playerCount === 0) {
                 break;
             }
 
-            console.log('Revealing Dealer');
+            //console.log('Revealing Dealer');
             // reveal dealer's hand
             this.showDealerHand();
             this.emitStatus();
 
-            console.log('Suming dealer hand');
+            //console.log('Suming dealer hand');
             // if 16 or less, hit dealer until above 16
             let dealerSum = this.gameOfTable.sumHand(this.dealerHand);
 
             while (dealerSum <= 16) {
-                console.log('Hitting dealer');
+                //console.log('Hitting dealer');
                 this.dealDealer();
                 dealerSum = this.gameOfTable.sumHand(this.dealerHand);
                 this.emitStatus();
             }
 
             // compare hands and then pay winners
-            console.log('Paying players');
-            this.payPlayers(dealerSum, this.handsSum, this.players);
+            //console.log('Paying players');
+            this.payPlayers(dealerSum);
             this.emitStatus();
 
             await this.timer(WAIT_TIME);
 
-            console.log('Reseting Table');
+            //console.log('Reseting Table');
             // repeat if players present at table, else idle (out of while loop)
             this.resetTable();
             this.emitStatus();
         }
-        this.resetTable();
 
-        console.log('GameLoop terminated');
+        this.resetTable();
+        //console.log('GameLoop terminated');
+        this.loopRunning = false; 
     }
 
     async timer(waitTime) {
@@ -404,15 +421,15 @@ class Table {
 
     handleLeaveEvent(playerId) {
         let p = this.findPlayerById(playerId);
-        if (p !== null) {
+        if (p) {
             let seat = p.getSeat();
             p.leaveTable();
             this.actives[seat] = null;
             if (this.currentPlayer === seat) {
-                this.getNextPlayer();
-                this.emitToSocket('PLAYER_LEFT', { playerSeat: seat });
+                this.getNextPlayer();  
             }
-            console.log(p.getName() + ' left');
+            this.emitToSocket('PLAYER_LEFT', { playerSeat: seat });
+            //console.log(p.getName() + ' left');
         }
     }
 
@@ -421,6 +438,16 @@ class Table {
         let player = new Player(name);
         player.joinTable(this);
         return player.getPlayerId();
+    }
+
+    isBetEmpty() {
+        console.log(this.bets);
+        for (let [k, v] of this.bets) {
+            if (v) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -450,16 +477,15 @@ class Table {
     /**
      * 
      * @param {Integer} dealerSum deals hand sum
-     * @param {Object} handsSum Object<PlayerId, handSum:Integer>
      * @param {Array} players the array of players
      */
     payPlayers(dealerSum) {
         for (let player of this.players) {
             if (player !== null && this.isActive(player)) {
-                console.log('Before Payment Player has: ' + player.getChips());
+                //console.log('Before Payment Player has: ' + player.getChips());
                 // TODO handsum
                 let handSum = this.gameOfTable.sumHand(this.playersHands.get(player.getPlayerId()));
-                console.log(player.getName() + ' has ' + handSum);
+                //console.log(player.getName() + ' has ' + handSum);
                 if (handSum <= 21) {
                     // blackjack
                     if (handSum === 21 && this.playersHands.get(player.getPlayerId()).length === 2 && dealerSum !== 21) {
@@ -475,14 +501,14 @@ class Table {
                         }
                     }
                 }
-                console.log('After Payment Player has: ' + player.getChips());
+                //console.log('After Payment Player has: ' + player.getChips());
             }
         }
     }
 
 
     resetTable() {
-        console.log("reset Called");
+        //console.log("reset Called");
         for (let player of this.players) {
             if (player) {
                 // reset hand
@@ -495,8 +521,9 @@ class Table {
         this.hideDealerHand();
         this.actives = Array(this.size);
         this.currentPlayer = 0;
+        this.refillPlayers();
+        
     }
-
 
     getPlayerById(playerId) {
         for (let player of this.players) {
@@ -508,6 +535,16 @@ class Table {
         }
         return null;
     }
+
+
+    refillPlayers() {
+        for (let player of this.players) {
+            if (player)
+                if (player.getChips() === 0)
+                    player.addChips(100);
+        }
+    }
+
 }
 
 module.exports = Table;

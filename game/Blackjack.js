@@ -29,10 +29,11 @@ class Blackjack{
      * @param players 
      * @param hands 
      */
-    dealAll(dealerHand, players, bets, hands){
+    dealAll(dealerHand, bets, hands){
         for(let i = 0; i < 2; i++){
-            for (let playerId of bets.keys()){
-                hands.get(playerId).push(this.deck.getCard());
+            for (let [k, v] of bets) {
+                if (v)
+                    hands.get(k).push(this.deck.getCard());
             }
             dealerHand.push(this.deck.getCard());
         }

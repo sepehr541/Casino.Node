@@ -55,29 +55,29 @@ var { findEmptyTable } = require('../game/Manager.js');
 var Player = require('../game/Player');
 
 tablesNSP.on('connection', (socket) => {
-  console.log('Connected - backend socket');
+  //console.log('Connected - backend socket');
   socket.emit('connected');
   socket.on('connected', (msg) => {
     console.log(msg);
   })
 
   socket.on('JOIN_PUBLIC', (name) => {
-    console.log(name + ' sent request');
-    console.log('Looking for a table available');
+    //console.log(name + ' sent request');
+    //console.log('Looking for a table available');
     // find if a table is empty
     var table = findEmptyTable(tables, idArray);
 
     // if no empty table let client know
     if (table === null) {
       socket.emit('noTable');
-      console.log('No Table found');
+      //console.log('No Table found');
     }
     // if empty table found, join table's room
     else {
       socket.join(`table${table.getTableId()}`, () => {
         // table makes the new player and adds it to its
         let playerId = table.handleJoinEvent(name);
-        console.log(`Successfully joined table ${table.getTableId()}`);
+        //console.log(`Successfully joined table ${table.getTableId()}`);
         // send initial to sender, including playerId
         socket.emit('init', {
           ...table.getStatus(),
@@ -89,25 +89,25 @@ tablesNSP.on('connection', (socket) => {
     }
   })
   socket.on('BET', (payload) => {
-    console.log('BET Event received');
+    //console.log('BET Event received');
     tables[payload.tableId].handleBetEvent(payload);
   })
 
   socket.on('HIT', (payload) => {
-    console.log('HIT Event received');
+    //console.log('HIT Event received');
     tables[payload.tableId].handleHitEvent(payload);
   })
 
   socket.on('STAY', (payload) => {
-    console.log('STAY Event received');
+    //console.log('STAY Event received');
     tables[payload.tableId].handleStayEvent(payload);
   })
 
   socket.on('LEAVE', (payload) => {
-    console.log('LEAVE Event received');
-    socket.leave(`table${payload.tableId}`, ()=>{
-      console.log("Table Left");
-    });
+    //console.log('LEAVE Event received');
+    // socket.leave(`table${payload.tableId}`, ()=>{
+    //   //console.log("Table Left");
+    // });
     tables[payload.tableId].handleLeaveEvent(payload.playerId);
   })
 })
