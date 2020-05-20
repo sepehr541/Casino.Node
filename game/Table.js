@@ -238,7 +238,7 @@ class Table {
 
     async gameLoop() {
         this.loopRunning = true;
-        //console.log('Game Loop started');
+        console.log('Game Loop started');
         let WAIT_TIME = 10000;
 
         while (this.playerCount > 0) {
@@ -352,7 +352,7 @@ class Table {
         }
 
         this.resetTable();
-        //console.log('GameLoop terminated');
+        console.log('GameLoop terminated');
         this.loopRunning = false; 
     }
 
