@@ -92,7 +92,7 @@ class Table {
     }
 
     getNextPlayer() {
-        console.log('Get next player is called');
+        //console.log('Get next player is called');
         // add to the index
         this.currentPlayer = (this.currentPlayer + 1) % (this.size + 1);
         if (this.currentPlayer !== this.size) {
@@ -157,32 +157,6 @@ class Table {
         return this.tableId;
     }
 
-    drawTable() {
-        this.players.forEach(player => {
-            if (player !== null) {
-                let id = player.getPlayerId();
-                console.log(`${player.getName()} : ${this.bets.get(id)}, Hand: ${this.drawHand(this.playersHands.get(id))}`);
-            }
-        })
-        if (this.dealerHand.length !== 0) {
-            console.log(`Dealer : ${this.drawHand(this.dealerHand)}`);
-        }
-    }
-
-    /**
-     * Draw hand with utf8
-     * @param {String[]} hand 
-     */
-    drawHand(hand) {
-
-        let suited = []
-        hand.forEach(card => {
-            let splited = card.split("-");
-            suited.push(`${Suit[splited[0]]}${Rank[splited[1]]}`);
-        })
-        return suited;
-    }
-
     getStatus() {
         // each player has a name, bet, hand, seatIndex
 
@@ -233,12 +207,12 @@ class Table {
     emitStatus() {
         let status = this.getStatus();
         //console.log("Emitting Event UPDATE");
-        console.log(status);
+        //console.log(status);
         this.emitToSocket('UPDATE', status);
     }
 
     handleBetEvent({ playerId, value }) {
-        console.log('Betting');
+        //console.log('Betting');
         try {
             this.findPlayer(playerId).betChips(value);
             this.emitStatus();
@@ -441,7 +415,7 @@ class Table {
     }
 
     isBetEmpty() {
-        console.log(this.bets);
+        //console.log(this.bets);
         for (let [k, v] of this.bets) {
             if (v) {
                 return false;
@@ -493,7 +467,7 @@ class Table {
                     }
                     // regular hand
                     else {
-                        console.log('Regular Hand');
+                        //console.log('Regular Hand');
                         if (handSum > dealerSum || (dealerSum > 21 && handSum <= 21)) {
                             player.addChips(this.bets.get(player.getPlayerId()) * 2);
                         } else if (handSum === dealerSum) {
